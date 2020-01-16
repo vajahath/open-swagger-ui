@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  release:
+    types: published
+
+jobs:
+  Deploy-To-NPM:
+    runs-on: ubuntu-latest
+    name: Deploy to NPM
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1.2.0
+        with:
+          node-version: '12'
+          registry-url: 'https://registry.npmjs.org'
+      - run: node --version
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run rescope vaju
+      - run: ls && npm publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  Deploy-To-GitHub-Package-Registry:
+    runs-on: ubuntu-latest
+    name: Deploy to GPR
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1.2.0
+        with:
+          node-version: '12'
+          registry-url: 'https://npm.pkg.github.com'
+      - run: node --version
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run rescope vajahath
+      - run: ls && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}

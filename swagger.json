@@ -1,0 +1,664 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "OrderHistory API version 4",
+    "description": "API definition of [Order History](https://frit.rickcloud.jp/wiki/x/GKpAC) version 4.\nPlease refer to [this page](https://frit.rickcloud.jp/wiki/x/1NFAC) to check wether this version is available for the region/brand combination you are looking for.\n\nDespite the name, Order History Platform (OHP) holds the purchase history of a customer. This is all the history of fulfilled orders (aka shipped). Depending on the region/country of deployment implementation (like data sources) and business logic might differ.\n\n***Note:*** Links on this page usually refer to Confluence which is only available to FR personell. Please request to your FR PIC to provide appropriate information.",
+    "version": "4.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://stage-api.fastretailing.com/order/v4/{brand}/{locale}",
+      "description": "Staging API server for QA",
+      "variables": {
+        "brand": {
+          "description": "abbrebrivation for one of uniqlos brands",
+          "default": "uq",
+          "enum": [
+            "uq",
+            "gu"
+          ]
+        },
+        "locale": {
+          "description": "iso-3166 alpha-2 country code the api was deployed to",
+          "default": "jp",
+          "enum": [
+            "jp",
+            "au",
+            "us",
+            "ca",
+            "sg",
+            "th",
+            "my",
+            "kr",
+            "tw",
+            "ph",
+            "id",
+            "in",
+            "de",
+            "uk",
+            "fr",
+            "es",
+            "se",
+            "dk",
+            "it"
+          ]
+        }
+      }
+    },
+    {
+      "url": "https://api.fastretailing.com/order/v4/{brand}/{locale}",
+      "description": "PRODUCTION API server",
+      "variables": {
+        "brand": {
+          "description": "abbrebrivation for one of uniqlos brands",
+          "default": "uq",
+          "enum": [
+            "uq",
+            "gu"
+          ]
+        },
+        "locale": {
+          "description": "iso-3166 alpha-2 country code the api was deployed to",
+          "default": "jp",
+          "enum": [
+            "jp",
+            "au",
+            "us",
+            "ca",
+            "sg",
+            "th",
+            "my",
+            "kr",
+            "tw",
+            "ph",
+            "id",
+            "in",
+            "de",
+            "uk",
+            "fr",
+            "es",
+            "se",
+            "dk",
+            "it"
+          ]
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/history": {
+      "parameters": [
+        {
+          "name": "x-fr-clientid",
+          "in": "header",
+          "description": "Client identifier of the service consumer. The clientId is issued by OrderHistoryPF. Please refer to [The Support](https://frit.rickcloud.jp/wiki/display/OP/The+Support) page to issue a new clientId.\n\n***Note:***\nThis page is only accessible by FR employees. Vendors are requested to contact their FR PIC for requests to OrderHistoryPF. Thank you!",
+          "required": true,
+          "deprecated": false,
+          "allowEmptyValue": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "accessToken",
+          "in": "query",
+          "description": "AccessToken to authenticate access to an account, gathered via [AccountPlatform API](https://frit.rickcloud.jp/wiki/x/5vhAC).\nPlease refer to the [AccountPF API Documentation]() for details on how to gather an accesstoken.\n\n**Note** that any errors related to the accesstoken are likely an ACPF related issue. Thus please confirm the gathering of the accesstoken is successful before requesting to OrderHistory API. The token can be validated via AccountPlatform!",
+          "required": true,
+          "deprecated": false,
+          "allowEmptyValue": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Purchase History"
+        ],
+        "summary": "endpoint method to get the complete merged purchase history of an account",
+        "description": "Gets purchase transaction history of all linked memberIds associated with the current account (of the passed accesstoken) for EC and store purchases.\nPlease note that OrderHistoryPF does not generate any data. The data returned is gathered from other platforms like Catalog and OMS. OHP will merge the data and resolve some required return like images. If you experience issues with any of the data returned you need to consult with the platform providing the data.\nFor example if product images are returning a 404 this needs to be discussed with CatalogPF.\nOrderHistoryPF can not help in these cases.",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "description": "sets the limit of the paginated return, if omitted it will return the default amount",
+            "required": false,
+            "deprecated": false,
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "sets the offset of the paginated return",
+            "required": false,
+            "deprecated": false,
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful return response",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result",
+                    "transactions",
+                    "pagination_url"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "boolean",
+                      "description": "Result of the request",
+                      "example": true
+                    },
+                    "transactions": {
+                      "type": "array",
+                      "description": "array of transactions",
+                      "items": {
+                        "type": "object",
+                        "description": "transaction result in case of a succesful request",
+                        "properties": {
+                          "register": {
+                            "description": "*please add an apropriate description*",
+                            "type": "string",
+                            "example": "1",
+                            "nullable": true
+                          },
+                          "salesperson": {
+                            "description": "*please add an apropriate description*",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "closedStore": {
+                            "description": "*please add an apropriate description*",
+                            "type": "integer",
+                            "example": 0,
+                            "nullable": true
+                          },
+                          "storeID": {
+                            "description": "id of the store where the purchase was made",
+                            "type": "string",
+                            "example": "10100885",
+                            "nullable": true
+                          },
+                          "region": {
+                            "description": "*please add an apropriate description*",
+                            "type": "string",
+                            "example": "01",
+                            "nullable": true
+                          },
+                          "quantity": {
+                            "description": "*please add an apropriate description*",
+                            "type": "integer",
+                            "example": 2,
+                            "nullable": true
+                          },
+                          "error_ind": {
+                            "description": "*please add an apropriate description*",
+                            "type": "string",
+                            "example": "N",
+                            "nullable": true
+                          },
+                          "onlineID": {
+                            "description": "*please add an apropriate description*",
+                            "type": "string",
+                            "example": "153833",
+                            "nullable": true
+                          },
+                          "member_id": {
+                            "description": "memberID issued by [AccountPlatform](https://frit.rickcloud.jp/wiki/x/5vhAC).\nPlease refer to the AccountPlatform documentation on how to accquire an ID.",
+                            "type": "string",
+                            "example": "7011958620113",
+                            "nullable": false
+                          },
+                          "sizeCode": {
+                            "description": "*please enter a proper description here*",
+                            "type": "string",
+                            "example": "AXA000",
+                            "nullable": true
+                          },
+                          "lengthCode": {
+                            "description": "*please add an apropriate description*",
+                            "type": "string",
+                            "example": "PTS000",
+                            "nullable": true
+                          },
+                          "alteration": {
+                            "description": "array of alterations made to the product on customer request",
+                            "type": "array",
+                            "items": {
+                              "type": "integer",
+                              "example": 69
+                            },
+                            "nullable": true
+                          },
+                          "alteration_flag": {
+                            "description": "alteration flag marking the type of alteration made to the product",
+                            "type": "string",
+                            "example": "1",
+                            "nullable": true
+                          },
+                          "alteration_unit": {
+                            "description": "unit of alteration made to the product",
+                            "type": "string",
+                            "example": "cm",
+                            "nullable": true
+                          },
+                          "alteration_name": {
+                            "description": "name of alteration made to the product",
+                            "type": "string",
+                            "example": "補正有",
+                            "nullable": true
+                          },
+                          "store": {
+                            "description": "name of store where the purchase was made",
+                            "type": "string",
+                            "example": "ユニクロ フレスポ八潮店",
+                            "nullable": true
+                          },
+                          "size": {
+                            "description": "size of the product",
+                            "type": "string",
+                            "example": "S",
+                            "nullable": true
+                          },
+                          "genderName": {
+                            "description": "name of store where the purchase was made",
+                            "type": "string",
+                            "example": "MEN",
+                            "nullable": true
+                          },
+                          "name": {
+                            "description": "name of the purchased product",
+                            "type": "string",
+                            "example": "ﾋｰﾄﾃｯｸｸﾙｰﾈｯｸT(S)",
+                            "nullable": true
+                          },
+                          "onlineCategory": {
+                            "description": "*please add a appropriate description*",
+                            "type": "string",
+                            "example": "001008009",
+                            "nullable": true
+                          },
+                          "active": {
+                            "description": "*please add an appropriate description*",
+                            "type": "boolean",
+                            "example": true,
+                            "nullable": true
+                          },
+                          "length": {
+                            "description": "*please enter an appropriate description*f",
+                            "type": "string",
+                            "example": "",
+                            "nullable": false
+                          },
+                          "image": {
+                            "description": "a product image url",
+                            "type": "string",
+                            "example": "https://stage-image.uniqlo.com/UQ/ST3/AsianCommon/imagesgoods/417079/item/goods_56_417079.jpg",
+                            "nullable": true
+                          },
+                          "colorCode": {
+                            "description": "color code of the product that always starts with three characters followed by two numbers from 00 to 99",
+                            "type": "string",
+                            "example": "ABL99",
+                            "pattern": "/\\D+/g",
+                            "nullable": true
+                          },
+                          "SKU": {
+                            "description": "sku of a product",
+                            "type": "string",
+                            "example": "418930-58-006-000",
+                            "nullable": true
+                          },
+                          "color": {
+                            "description": "*please add a appropriate description*",
+                            "type": "string",
+                            "example": "QAZWSX",
+                            "nullable": true
+                          },
+                          "br_rg_date_id": {
+                            "description": "*please add a proper description*",
+                            "type": "string",
+                            "example": "010114787741965548638447000000000",
+                            "nullable": true
+                          },
+                          "tran_no": {
+                            "description": "*please add a proper description*",
+                            "type": "string",
+                            "example": "123",
+                            "nullable": true
+                          },
+                          "price": {
+                            "description": "sales price of the product, the actual format (float, integer) of the number depends on the region/country",
+                            "type": "number",
+                            "example": "3990.90",
+                            "nullable": true
+                          },
+                          "ec_name": {
+                            "description": "*please enter a proper description*",
+                            "type": "string",
+                            "example": "ヒートテックウォームイージーパンツ（丈標準・79～82cm）",
+                            "nullable": true
+                          },
+                          "shippedAt": {
+                            "description": "shipping date as unix timestamp",
+                            "type": "string",
+                            "example": "1575720078",
+                            "nullable": true
+                          },
+                          "orderAt": {
+                            "description": "order date as unix timestamp",
+                            "type": "string",
+                            "example": "1575720078",
+                            "nullable": true
+                          },
+                          "pdpLink": {
+                            "description": "URL to the product page.",
+                            "type": "string",
+                            "example": "https://www.uniqlo.com/jp/en/women-socks-rib-196346COL09SIZ999000.html",
+                            "nullable": true
+                          },
+                          "onlineLink": {
+                            "description": "*please add a proper description*",
+                            "type": "string",
+                            "example": "",
+                            "nullable": true
+                          },
+                          "PLU": {
+                            "description": "*please add a proper description*",
+                            "type": "string",
+                            "example": "2000131834923",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    },
+                    "pagination_url": {
+                      "type": "string",
+                      "description": "Pagination is implemented using this parameter. The server will return a new path for the next page with the 'start' parameter pre-filled. Clients must append the accesstoken to the 'accessToken' parameter in this new path and then visit the path for the next page. If no more pages are present the parameter will have a value: 'result is empty' and the 'transactions' array will be empty",
+                      "example": "/order/v4/uq/jp/history?count=100&start=010114786724482455230828000000000&accessToken="
+                    },
+                    "total_count": {
+                      "type": "integer",
+                      "description": "total count of results, might be limited by pagination limit (see count parameter)",
+                      "example": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "return in case of invalide request parameter",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "example": false,
+                      "type": "boolean",
+                      "description": "Result of the request"
+                    },
+                    "message": {
+                      "enum": [
+                        "count should be number",
+                        "accessToken is required",
+                        "request body should be valid JSON",
+                        "request body should contain items array",
+                        "count should be grater than 0"
+                      ],
+                      "example": "accessToken is required",
+                      "type": "string",
+                      "description": "Message send detailing the response result, usually send on error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "return in case of credentials failure",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "example": false,
+                      "type": "boolean",
+                      "description": "Result of the request"
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": [
+                        "access_token is invalid"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "return in case of server error",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "example": false,
+                      "type": "boolean",
+                      "description": "Result of the request"
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": [
+                        "Can not complete Login. Error while fetching from account PF"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Purchase History"
+        ],
+        "summary": "endpoint method to delete purchase history of an account",
+        "description": "this method deletes the purchase transaction history of all memberIds associated with current account (of the passed accesstoken)",
+        "responses": {
+          "200": {
+            "description": "successfully delete purchase history response",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "result",
+                    "message"
+                  ],
+                  "properties": {
+                    "result": {
+                      "type": "boolean",
+                      "description": "Result of the request",
+                      "example": true
+                    },
+                    "message": {
+                      "enum": [
+                        "deleted history"
+                      ],
+                      "type": "string",
+                      "description": "Message send detailing the response result, usually send on error",
+                      "example": "whoops something bad happend"
+                    }
+                  },
+                  "example": {
+                    "result": true,
+                    "message": "deleted history"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "return in case of invalide request parameter",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "example": false,
+                      "type": "boolean",
+                      "description": "Result of the request"
+                    },
+                    "message": {
+                      "enum": [
+                        "count should be number",
+                        "accessToken is required",
+                        "request body should be valid JSON",
+                        "request body should contain items array",
+                        "count should be grater than 0"
+                      ],
+                      "example": "accessToken is required",
+                      "type": "string",
+                      "description": "Message send detailing the response result, usually send on error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "return in case of credentials failure",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "example": false,
+                      "type": "boolean",
+                      "description": "Result of the request"
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": [
+                        "access_token is invalid"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "return in case of server error",
+            "headers": {
+              "content-type": {
+                "description": "content type of the return",
+                "schema": {
+                  "type": "string",
+                  "example": "application/json; charset=UTF-8"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "result": {
+                      "example": false,
+                      "type": "boolean",
+                      "description": "Result of the request"
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": [
+                        "Can not complete Login. Error while fetching from account PF"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {}
+}
