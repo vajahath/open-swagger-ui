@@ -13,15 +13,14 @@ import { toUnix } from 'upath';
  */
 export async function startServerWithSwaggerFile(file: string) {
   const port = await getPort();
-  const swaggerDoc = await getSwaggerDoc(file);
+  const { parsedDoc, swagFilePath } = await getSwaggerDoc(file);
   const app = express();
 
-  app.use('/swagger-doc', SwaggerHandle.serve, SwaggerHandle.setup(swaggerDoc));
+  app.use('/swagger-doc', SwaggerHandle.serve, SwaggerHandle.setup(parsedDoc));
 
-  console.log(`Swagger open on port ${port}`);
   const server = app.listen(port);
 
-  return { app, port, server };
+  return { app, port, server, swagFilePath };
 }
 
 /**
@@ -43,27 +42,32 @@ function pathResolver(file: string): string {
  * @param {string} file The swagger file path
  * @return {object} swagger doc
  */
-async function getSwaggerDoc(file: string): Promise<object> {
+async function getSwaggerDoc(
+  file: string
+): Promise<{ parsedDoc: object; swagFilePath: string }> {
   const swagFilePath = pathResolver(file);
-  console.log('> gotten file: ' + swagFilePath);
+
+  let parsedDoc: object = {};
 
   try {
     // check file
-    const swaggerDoc = require(swagFilePath);
-    return swaggerDoc;
+    parsedDoc = require(swagFilePath);
   } catch (err) {
     // fall back to url
     try {
       const swaggerDocString = (await got(swagFilePath)).body;
 
       try {
-        return JSON.parse(swaggerDocString);
+        parsedDoc = JSON.parse(swaggerDocString);
       } catch (err) {
-        console.error('The JSON is malformed');
-        throw err;
+        throw new Error('The JSON is malformed');
       }
     } catch (err) {
-      throw new Error('The given swagger file could not be found.');
+      throw new Error(
+        `The given swagger file (${swagFilePath}) could not be found.`
+      );
     }
   }
+
+  return { parsedDoc, swagFilePath };
 }

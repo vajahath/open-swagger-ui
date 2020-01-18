@@ -5,6 +5,7 @@ import program from 'commander';
 import { startServerWithSwaggerFile } from '../index';
 import open from 'open';
 const pkgVer = require('../../package.json').version;
+import ora from 'ora';
 
 program
   .version(pkgVer)
@@ -19,9 +20,20 @@ program.parse(process.argv);
  * @param {string} file swagger file
  */
 async function handle(file: string) {
-  const { port } = await startServerWithSwaggerFile(file);
+  const spinner = ora('Loading file ..').start();
 
-  if (program.open) {
-    await open(`http://localhost:${port}/swagger-doc`);
+  try {
+    const { port, swagFilePath } = await startServerWithSwaggerFile(file);
+
+    spinner.text = `Loading file ${swagFilePath}`;
+
+    if (program.open) {
+      await open(`http://localhost:${port}/swagger-doc`);
+    }
+    spinner.succeed();
+    console.log(`Swagger open on port ${port}`);
+  } catch (err) {
+    spinner.fail();
+    console.error(err);
   }
 }
