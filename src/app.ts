@@ -9,10 +9,15 @@ import { toUnix } from 'upath';
 /**
  * Start server by calling this function
  * @param {string} file swagger.json file
+ * @param {string} requestedPort choose a port, if not available
+ * a random port is selected
  * @return {object} server object, just incase if required
  */
-export async function startServerWithSwaggerFile(file: string) {
-  const port = await getPort();
+export async function startServerWithSwaggerFile(
+  file: string,
+  requestedPort: number = 3344
+) {
+  const port = await getPort({ port: requestedPort });
   const { parsedDoc, swagFilePath } = await getSwaggerDoc(file);
   const app = express();
 
