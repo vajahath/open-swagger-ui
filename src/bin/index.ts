@@ -11,6 +11,7 @@ const DEFAULT_PORT = 3355;
 
 program
   .version(pkgVer)
+  .description('An easy cli to open swagger.json files in Swagger UI.')
   .arguments('<swagger-file>')
   .action(handle)
   .option('-O, --open', 'Open stuff in browser')
