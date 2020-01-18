@@ -1,12 +1,12 @@
 # open-swagger-ui
 
-An easy cli to open `swagger.json` in [Swagger UI](https://swagger.io/tools/swagger-ui/).
+An easy CLI to open `swagger.json` in [Swagger UI](https://swagger.io/tools/swagger-ui/).
 
 ```bash
-$ open-swagger-ui ./swagger.json --open # 🎆 done !
+$ open-swagger-ui ./swagger.json --open # done !
 ```
 
-![](https://github.com/vajahath/open-swagger-ui/workflows/Build/badge.svg)
+![](https://github.com/vajahath/open-swagger-ui/workflows/Build/badge.svg) [![](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
 ## Install
 
@@ -19,8 +19,6 @@ npm i -g open-swagger-ui
 ```
 
 From [Github Package Registry](https://github.com/vajahath/open-swagger-ui/packages). ([Guide](https://help.github.com/en/github/managing-packages-with-github-packages/configuring-npm-for-use-with-github-packages)).
-
-[![](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
 Type definitions are bundled with this package.
 
@@ -41,13 +39,13 @@ $ open-swagger-ui <absolute-path-to-swagger.json> --port 8899
 $ open-swagger-ui https://petstore.swagger.io/v2/swagger.json
 ```
 
-more
+### `--help` for help
 
 ```bash
 $ open-swagger-ui --help
-Usage: index [options] <swagger-file>
+Usage: open-swagger-ui [options] <swagger-file>
 
-An easy cli to open swagger.json files in Swagger UI.
+An easy CLI tool to open swagger.json files in Swagger UI.
 
 Options:
   -V, --version      output the version number
@@ -77,7 +75,7 @@ startServerWithSwaggerFile('./path/to/swagger.json', port)
 
 The `startServerWithSwaggerFile` function returns express `app`, the [HTTP `server`](https://nodejs.org/dist/latest-v13.x/docs/api/http.html#http_class_http_server) instance, `port` in which the file is open and the reference `swagFilePath`.
 
-Scaffolding [ts-np-generator](https://github.com/vajahath/generator-ts-np).
+_(Project scaffolded with [ts-np-generator](https://github.com/vajahath/generator-ts-np))_
 
 ## Licence
 
