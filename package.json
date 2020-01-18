@@ -41,8 +41,10 @@
   "homepage": "https://github.com/vajahath/open-swagger-ui#readme",
   "devDependencies": {
     "@types/express": "^4.17.2",
+    "@types/got": "^9.6.9",
+    "@types/is-url": "^1.2.28",
     "@types/jest": "^24.0.23",
-    "@types/node": "^13.1.1",
+    "@types/node": "^13.1.8",
     "@types/swagger-ui-express": "^4.1.1",
     "@types/update-notifier": "^2.5.0",
     "@types/yeoman-generator": "^3.1.4",
@@ -63,8 +65,12 @@
     "commander": "^4.1.0",
     "express": "^4.17.1",
     "get-port": "^5.1.1",
+    "got": "^10.2.2",
+    "is-url": "^1.2.4",
     "open": "^7.0.0",
+    "ora": "^4.0.3",
     "swagger-ui-express": "^4.1.2",
+    "upath": "^1.2.0",
     "update-notifier": "^4.0.0"
   }
 }
