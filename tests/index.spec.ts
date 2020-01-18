@@ -43,4 +43,4 @@ test('testing base function with url', async done => {
     });
 });
 
-afterEach(done => theServer.close(err => (err ? done(err) : done())));
+afterEach(done => theServer.close(err => (err ? done(err) : done())), 8000);
