@@ -10,7 +10,7 @@ $ open-swagger-ui ./swagger.json --open # 🎆 done !
 
 ## Install
 
-Requires Node >=8.
+Requires Node `>=10`.
 
 From npm,
 
@@ -75,9 +75,9 @@ startServerWithSwaggerFile('./path/to/swagger.json', port)
   .catch(err => console.error('something went wrong', err));
 ```
 
-The `startServerWithSwaggerFile` function returns express `app`, the [HTTP `server`](https://nodejs.org/dist/latest-v13.x/docs/api/http.html#http_class_http_server) instance, `port` in which the file is open and the reference `swagFilePath`;
+The `startServerWithSwaggerFile` function returns express `app`, the [HTTP `server`](https://nodejs.org/dist/latest-v13.x/docs/api/http.html#http_class_http_server) instance, `port` in which the file is open and the reference `swagFilePath`.
 
-[![](https://img.shields.io/badge/built%20with-ts--np%203.0.0-beta.7-lightgrey?style=flat-square)](https://github.com/vajahath/generator-ts-np)
+Scaffolding [ts-np-generator](https://github.com/vajahath/generator-ts-np).
 
 ## Licence
 

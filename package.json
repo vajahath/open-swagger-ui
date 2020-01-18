@@ -1,5 +1,5 @@
 {
-  "name": "@vaju/open-swagger-ui",
+  "name": "open-swagger-ui",
   "version": "1.0.0",
   "description": "A easy cli to open swagger.json in Swagger UI",
   "main": "dist/index.js",
@@ -31,7 +31,7 @@
     "url": "git+https://github.com/vajahath/open-swagger-ui.git"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "author": "Vajahath Ahmed <vajuoff.1@gmail.com>",
   "license": "MIT",

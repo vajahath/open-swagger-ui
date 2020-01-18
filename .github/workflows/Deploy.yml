@@ -18,7 +18,6 @@ jobs:
       - run: node --version
       - run: npm ci
       - run: npm run lint
-      - run: npm run rescope vaju
       - run: ls && npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
