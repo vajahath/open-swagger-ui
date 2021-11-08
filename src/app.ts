@@ -5,6 +5,7 @@ import got from 'got';
 import { resolve as pathResolve, isAbsolute } from 'path';
 import isUrl from 'is-url';
 import { toUnix } from 'upath';
+import { existsSync, readFileSync } from 'fs';
 
 /**
  * Start server by calling this function
@@ -38,13 +39,12 @@ export async function startServerWithSwaggerFile(
  * @param {string} file url or file path to swagger.json
  * @return {string} resolved file name/url
  */
-function pathResolver(file: string): string {
-  const swagFilePath = isUrl(file) // is file url
-    ? file
+function pathResolver(file: string): { type: 'url' | 'path'; path: string } {
+  return isUrl(file) // is file url
+    ? { path: file, type: 'url' }
     : isAbsolute(file) // is absolute path
-    ? toUnix(file)
-    : toUnix(pathResolve(process.cwd(), file));
-  return swagFilePath;
+    ? { path: toUnix(file), type: 'path' }
+    : { type: 'path', path: toUnix(pathResolve(process.cwd(), file)) };
 }
 
 /**
@@ -57,27 +57,45 @@ async function getSwaggerDoc(
 ): Promise<{ parsedDoc: object; swagFilePath: string }> {
   const swagFilePath = pathResolver(file);
 
-  let parsedDoc: object = {};
+  let swaggerDoc: string | undefined;
 
-  try {
-    // check file
-    parsedDoc = require(swagFilePath);
-  } catch (err) {
-    // fall back to url
-    try {
-      const swaggerDocString = (await got(swagFilePath)).body;
-
-      try {
-        parsedDoc = JSON.parse(swaggerDocString);
-      } catch (err) {
-        throw new Error('The JSON is malformed');
-      }
-    } catch (err) {
-      throw new Error(
-        `The given swagger file (${swagFilePath}) could not be found.`
-      );
-    }
+  if (swagFilePath.type === 'url') {
+    swaggerDoc = (await got(swagFilePath.path)).body;
+  } else if (existsSync(swagFilePath.path)) {
+    swaggerDoc = readFileSync(swagFilePath.path).toString();
+  } else {
+    throw new Error(
+      `The given swagger file (${JSON.stringify(
+        swagFilePath
+      )}) could not be found.`
+    );
   }
 
-  return { parsedDoc, swagFilePath };
+  if (!swaggerDoc) {
+    throw new Error(
+      `The given swagger file (${JSON.stringify(
+        swagFilePath
+      )}) could not be read. Please report`
+    );
+  }
+
+  let parsedDoc: { [key: string]: unknown };
+
+  try {
+    parsedDoc = JSON.parse(swaggerDoc);
+  } catch (err) {
+    let error: Error;
+    if (!(err instanceof Error)) {
+      error = new Error('malformed JSON');
+    } else {
+      error = err;
+    }
+
+    (error as any).details =
+      'Unable to parse the JSON swagger file. The JSON may be malformed. Try https://jsonlint.com/ to validate JSON';
+    console.error((error as any).details);
+    throw error;
+  }
+
+  return { parsedDoc, swagFilePath: swagFilePath.path };
 }
