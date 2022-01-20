@@ -1,6 +1,6 @@
 # open-swagger-ui
 
-An easy CLI to open `swagger.json` in [Swagger UI](https://swagger.io/tools/swagger-ui/).
+An easy CLI to open `swagger.json` or `.yaml` files in [Swagger UI](https://swagger.io/tools/swagger-ui/).
 
 ```bash
 $ open-swagger-ui ./swagger.json --open # done !
@@ -45,7 +45,7 @@ $ open-swagger-ui https://petstore.swagger.io/v2/swagger.json
 $ open-swagger-ui --help
 Usage: open-swagger-ui [options] <swagger-file>
 
-An easy CLI tool to open swagger.json files in Swagger UI.
+An easy CLI tool to open swagger.json or .yaml files in Swagger UI.
 
 Options:
   -V, --version      output the version number
