@@ -5,9 +5,28 @@ import { Server } from 'http';
 
 let theServer: Server | undefined;
 
-test('testing base function with file path', async done => {
+test('testing base function with file path (JSON)', async done => {
   const { port, server } = await startServerWithSwaggerFile(
     join(__dirname, 'swagger.json')
+  );
+
+  theServer = server;
+
+  got(`http://localhost:${port}/swagger-doc`)
+    .then(resp => {
+      if (resp?.statusCode && resp?.statusCode < 400) {
+        return done();
+      }
+      throw new Error('invalid status code');
+    })
+    .catch(err => {
+      throw err;
+    });
+});
+
+test('testing base function with file path (YAML)', async done => {
+  const { port, server } = await startServerWithSwaggerFile(
+    join(__dirname, 'swagger.yaml')
   );
 
   theServer = server;
@@ -38,7 +57,21 @@ test('testing base function with MALFORMED JSON file path', async done => {
   try {
     await startServerWithSwaggerFile(join(__dirname, 'swagger.json-malformed'));
   } catch (err) {
-    expect(err.details).toContain('The JSON may be malformed');
+    expect(err.details).toContain(
+      'Unable to parse the file with JSON/YAML parsers'
+    );
+    theServer = undefined;
+    return done();
+  }
+});
+
+test('testing base function with MALFORMED YAML file path', async done => {
+  try {
+    await startServerWithSwaggerFile(join(__dirname, 'swagger.yaml-malformed'));
+  } catch (err) {
+    expect(err.details).toContain(
+      'Unable to parse the file with JSON/YAML parsers'
+    );
     theServer = undefined;
     return done();
   }
