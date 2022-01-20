@@ -6,6 +6,8 @@ import { resolve as pathResolve, isAbsolute } from 'path';
 import isUrl from 'is-url';
 import { toUnix } from 'upath';
 import { existsSync, readFileSync } from 'fs';
+import YAML from 'js-yaml';
+import isPlainObject from 'lodash.isplainobject';
 
 /**
  * Start server by calling this function
@@ -42,7 +44,7 @@ export async function startServerWithSwaggerFile(
 function pathResolver(file: string): { type: 'url' | 'path'; path: string } {
   return isUrl(file) // is file url
     ? { path: file, type: 'url' }
-    : isAbsolute(file) // is absolute path
+    : isAbsolute(file)
     ? { path: toUnix(file), type: 'path' }
     : { type: 'path', path: toUnix(pathResolve(process.cwd(), file)) };
 }
@@ -79,23 +81,27 @@ async function getSwaggerDoc(
     );
   }
 
-  let parsedDoc: { [key: string]: unknown };
+  let parsedDoc: unknown;
 
   try {
+    // try JSON
     parsedDoc = JSON.parse(swaggerDoc);
-  } catch (err) {
-    let error: Error;
-    if (!(err instanceof Error)) {
-      error = new Error('malformed JSON');
-    } else {
-      error = err;
-    }
+  } catch (errFromJSONParse) {
+    try {
+      // try YAML
+      parsedDoc = YAML.load(swaggerDoc);
+      if (!isPlainObject(parsedDoc)) {
+        throw new Error('YAML is invalid');
+      }
+    } catch (errFromYAMLParse) {
+      const error = new Error('Malformed or invalid swagger file (JSON/YAML)');
 
-    (error as any).details =
-      'Unable to parse the JSON swagger file. The JSON may be malformed. Try https://jsonlint.com/ to validate JSON';
-    console.error((error as any).details);
-    throw error;
+      (error as any).details =
+        'Unable to parse the file with JSON/YAML parsers';
+      console.error((error as any).details);
+      throw error;
+    }
   }
 
-  return { parsedDoc, swagFilePath: swagFilePath.path };
+  return { parsedDoc: parsedDoc as object, swagFilePath: swagFilePath.path };
 }

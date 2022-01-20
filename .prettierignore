@@ -1,1 +1,3 @@
 tests/swagger.json-malformed
+tests/swagger.yaml-malformed
+*.yaml
