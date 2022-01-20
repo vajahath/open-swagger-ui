@@ -37,11 +37,15 @@ async function handle(file: string) {
 
     spinner.text = `Loading file ${swagFilePath}`;
 
+    const viewUrl = `http://localhost:${port}/swagger-doc`;
     if (program.open) {
-      await open(`http://localhost:${port}/swagger-doc`);
+      await open(viewUrl);
     }
     spinner.succeed();
     console.log(`Swagger open on port ${port}`);
+    if (program.open) {
+      console.log('Opening browser at ' + viewUrl);
+    }
   } catch (err) {
     spinner.fail();
     console.error(err);
