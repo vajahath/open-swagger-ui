@@ -75,8 +75,6 @@ startServerWithSwaggerFile('./path/to/swagger.json', port)
 
 The `startServerWithSwaggerFile` function returns express `app`, the [HTTP `server`](https://nodejs.org/dist/latest-v13.x/docs/api/http.html#http_class_http_server) instance, `port` in which the file is open and the reference `swagFilePath`.
 
-_(Project scaffolded with [ts-np-generator](https://github.com/vajahath/generator-ts-np))_
-
 ## Licence
 
 MIT &copy; [Vajahath Ahmed](https://twitter.com/vajahath7)
