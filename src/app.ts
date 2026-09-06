@@ -4,10 +4,19 @@ import getPort from 'get-port';
 import got from 'got';
 import { resolve as pathResolve, isAbsolute } from 'path';
 import isUrl from 'is-url';
-import { toUnix } from 'upath';
+import upath from 'upath';
 import { existsSync, readFileSync } from 'fs';
 import YAML from 'js-yaml';
 import isPlainObject from 'lodash.isplainobject';
+
+import type { Server } from 'http';
+
+export interface SwaggerServerResult {
+  app: any;
+  port: number;
+  server: Server;
+  swagFilePath: string;
+}
 
 /**
  * Start server by calling this function
@@ -19,7 +28,7 @@ import isPlainObject from 'lodash.isplainobject';
 export async function startServerWithSwaggerFile(
   file: string,
   requestedPort: number = 3344,
-) {
+): Promise<SwaggerServerResult> {
   const port = await getPort({ port: requestedPort });
   const { parsedDoc, swagFilePath } = await getSwaggerDoc(file);
   const app = express();
@@ -49,8 +58,8 @@ function pathResolver(file: string): { type: 'url' | 'path'; path: string } {
   return isUrl(file) // is file url
     ? { path: file, type: 'url' }
     : isAbsolute(file)
-      ? { path: toUnix(file), type: 'path' }
-      : { type: 'path', path: toUnix(pathResolve(process.cwd(), file)) };
+      ? { path: upath.toUnix(file), type: 'path' }
+      : { type: 'path', path: upath.toUnix(pathResolve(process.cwd(), file)) };
 }
 
 /**

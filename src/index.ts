@@ -1,3 +1,3 @@
-import { startServerWithSwaggerFile } from './app';
+import { startServerWithSwaggerFile, type SwaggerServerResult } from './app';
 
-export { startServerWithSwaggerFile };
+export { startServerWithSwaggerFile, type SwaggerServerResult };
