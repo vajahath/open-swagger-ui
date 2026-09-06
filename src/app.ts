@@ -12,13 +12,13 @@ import isPlainObject from 'lodash.isplainobject';
 /**
  * Start server by calling this function
  * @param {string} file swagger.json file
- * @param {string} requestedPort choose a port, if not available
+ * @param {number} requestedPort choose a port, if not available
  * a random port is selected
  * @return {object} server object, just incase if required
  */
 export async function startServerWithSwaggerFile(
   file: string,
-  requestedPort: number = 3344
+  requestedPort: number = 3344,
 ) {
   const port = await getPort({ port: requestedPort });
   const { parsedDoc, swagFilePath } = await getSwaggerDoc(file);
@@ -32,6 +32,10 @@ export async function startServerWithSwaggerFile(
   });
 
   const server = app.listen(port);
+  await new Promise<void>((resolve, reject) => {
+    server.once('listening', () => resolve());
+    server.once('error', reject);
+  });
 
   return { app, port, server, swagFilePath };
 }
@@ -45,8 +49,8 @@ function pathResolver(file: string): { type: 'url' | 'path'; path: string } {
   return isUrl(file) // is file url
     ? { path: file, type: 'url' }
     : isAbsolute(file)
-    ? { path: toUnix(file), type: 'path' }
-    : { type: 'path', path: toUnix(pathResolve(process.cwd(), file)) };
+      ? { path: toUnix(file), type: 'path' }
+      : { type: 'path', path: toUnix(pathResolve(process.cwd(), file)) };
 }
 
 /**
@@ -55,7 +59,7 @@ function pathResolver(file: string): { type: 'url' | 'path'; path: string } {
  * @return {object} swagger doc
  */
 async function getSwaggerDoc(
-  file: string
+  file: string,
 ): Promise<{ parsedDoc: object; swagFilePath: string }> {
   const swagFilePath = pathResolver(file);
 
@@ -68,16 +72,16 @@ async function getSwaggerDoc(
   } else {
     throw new Error(
       `The given swagger file (${JSON.stringify(
-        swagFilePath
-      )}) could not be found.`
+        swagFilePath,
+      )}) could not be found.`,
     );
   }
 
   if (!swaggerDoc) {
     throw new Error(
       `The given swagger file (${JSON.stringify(
-        swagFilePath
-      )}) could not be read. Please report`
+        swagFilePath,
+      )}) could not be read. Please report`,
     );
   }
 
@@ -86,14 +90,14 @@ async function getSwaggerDoc(
   try {
     // try JSON
     parsedDoc = JSON.parse(swaggerDoc);
-  } catch (errFromJSONParse) {
+  } catch {
     try {
       // try YAML
       parsedDoc = YAML.load(swaggerDoc);
       if (!isPlainObject(parsedDoc)) {
         throw new Error('YAML is invalid');
       }
-    } catch (errFromYAMLParse) {
+    } catch {
       const error = new Error('Malformed or invalid swagger file (JSON/YAML)');
 
       (error as any).details =

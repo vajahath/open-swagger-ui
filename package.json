@@ -1,30 +1,46 @@
 {
   "name": "open-swagger-ui",
-  "version": "1.2.0",
-  "description": "A easy cli to open swagger(.json or .yaml) files in Swagger UI",
-  "main": "dist/index.js",
+  "version": "1.3.0",
+  "description": "An easy CLI to open swagger(.json or .yaml) files in Swagger UI",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
-    "open-swagger-ui": "dist/bin/open-swagger-ui.js"
+    "open-swagger-ui": "./dist/bin/open-swagger-ui.cjs"
   },
   "files": [
     "dist/**/*",
     "!dist/**/*.map"
   ],
-  "typings": "dist/index.d.ts",
   "directories": {
     "test": "tests",
     "lib": "dist"
   },
   "scripts": {
-    "test": "npm run build && jest --coverage --config jest.config.json",
-    "prepublishOnly": "npm run test",
-    "build": "npm run lint && npm run clean-builds && npm run src-build && npm run tests-build && npm run copy-assets",
-    "src-build": "tsc -p tsconfig.json",
-    "tests-build": "tsc -p tsconfig.spec.json",
-    "rescope": "npm-scope-prefixer -s",
-    "lint": "prettier \"src/**/*\" \"tests/**/*\" -l && eslint \"src/**/*\" \"tests/**/*\"",
-    "copy-assets": "gulp copy-src-assets && gulp copy-tests-assets",
-    "clean-builds": "gulp clean-builds"
+    "build": "tsdown",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:compat": "node scripts/test-compat.cjs",
+    "test:docker": "bash scripts/test-docker.sh",
+    "prepublishOnly": "npm run test && npm run test:compat",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format": "prettier --check \"src/**/*.{ts,js,json}\" \"tests/**/*.{ts,js,json}\"",
+    "format:fix": "prettier --write \"src/**/*.{ts,js,json}\" \"tests/**/*.{ts,js,json}\""
   },
   "repository": {
     "type": "git",
@@ -40,28 +56,22 @@
   },
   "homepage": "https://github.com/vajahath/open-swagger-ui#readme",
   "devDependencies": {
-    "@types/express": "^4.17.2",
-    "@types/got": "^9.6.9",
-    "@types/is-url": "^1.2.28",
-    "@types/jest": "^24.0.23",
-    "@types/js-yaml": "^4.0.5",
-    "@types/lodash.isplainobject": "^4.0.6",
-    "@types/node": "^13.1.8",
-    "@types/swagger-ui-express": "^4.1.1",
-    "@types/update-notifier": "^2.5.0",
-    "@types/yeoman-generator": "^3.1.4",
-    "@typescript-eslint/eslint-plugin": "^2.8.0",
-    "@typescript-eslint/parser": "^2.8.0",
-    "@vaju/npm-scope-prefixer": "^1.1.0",
-    "del": "^5.1.0",
-    "eslint": "^6.7.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-config-prettier": "^6.7.0",
-    "gulp": "^4.0.2",
-    "gulp-cli": "^2.2.0",
-    "jest": "^24.9.0",
-    "prettier": "^1.19.1",
-    "typescript": "^3.7.2"
+    "@types/express": "^4.17.21",
+    "@types/is-url": "^1.2.32",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash.isplainobject": "^4.0.9",
+    "@types/node": "^20.17.0",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/update-notifier": "^5.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.4.2",
+    "tsdown": "latest",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "commander": "^4.1.0",
@@ -69,9 +79,9 @@
     "get-port": "^5.1.1",
     "got": "^11.8.5",
     "is-url": "^1.2.4",
-    "open": "^8.4.0",
     "js-yaml": "^4.1.0",
     "lodash.isplainobject": "^4.0.6",
+    "open": "^8.4.0",
     "ora": "^4.0.3",
     "swagger-ui-express": "^4.1.2",
     "upath": "^1.2.0",

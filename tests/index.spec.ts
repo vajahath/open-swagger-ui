@@ -1,118 +1,106 @@
-const { startServerWithSwaggerFile } = require('../dist/index');
+import { describe, it, expect, afterEach } from 'vitest';
+import { startServerWithSwaggerFile } from '../src/index';
 import { join } from 'path';
 import got from 'got';
-import { Server } from 'http';
+import http, { Server } from 'http';
+import { readFileSync } from 'fs';
 
-let theServer: Server | undefined;
+describe('open-swagger-ui test suite', () => {
+  let theServer: Server | undefined;
 
-test('testing base function with file path (JSON)', async done => {
-  const { port, server } = await startServerWithSwaggerFile(
-    join(__dirname, 'swagger.json')
-  );
+  afterEach(async () => {
+    if (theServer) {
+      await new Promise<void>((resolve) => theServer!.close(() => resolve()));
+      theServer = undefined;
+    }
+  });
 
-  theServer = server;
-
-  got(`http://localhost:${port}/swagger-doc`)
-    .then(resp => {
-      if (resp?.statusCode && resp?.statusCode < 400) {
-        return done();
-      }
-      throw new Error('invalid status code');
-    })
-    .catch(err => {
-      throw err;
-    });
-});
-
-test('testing base function with file path (YAML)', async done => {
-  const { port, server } = await startServerWithSwaggerFile(
-    join(__dirname, 'swagger.yaml')
-  );
-
-  theServer = server;
-
-  got(`http://localhost:${port}/swagger-doc`)
-    .then(resp => {
-      if (resp?.statusCode && resp?.statusCode < 400) {
-        return done();
-      }
-      throw new Error('invalid status code');
-    })
-    .catch(err => {
-      throw err;
-    });
-});
-
-test('testing base function with INVALID file path', async done => {
-  try {
-    await startServerWithSwaggerFile(join(__dirname, 'swagger.json-invalid'));
-  } catch (err) {
-    expect(err.message).toContain('could not be found');
-    theServer = undefined;
-    return done();
-  }
-});
-
-test('testing base function with MALFORMED JSON file path', async done => {
-  try {
-    await startServerWithSwaggerFile(join(__dirname, 'swagger.json-malformed'));
-  } catch (err) {
-    expect(err.details).toContain(
-      'Unable to parse the file with JSON/YAML parsers'
+  it('serves swagger UI with JSON spec', async () => {
+    const { port, server, swagFilePath } = await startServerWithSwaggerFile(
+      join(__dirname, 'swagger.json'),
     );
-    theServer = undefined;
-    return done();
-  }
-});
+    theServer = server;
 
-test('testing base function with MALFORMED YAML file path', async done => {
-  try {
-    await startServerWithSwaggerFile(join(__dirname, 'swagger.yaml-malformed'));
-  } catch (err) {
-    expect(err.details).toContain(
-      'Unable to parse the file with JSON/YAML parsers'
+    expect(swagFilePath).toContain('swagger.json');
+    const resp = await got(`http://127.0.0.1:${port}/swagger-doc/`);
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body).toContain('Swagger UI');
+  });
+
+  it('serves swagger UI with YAML spec', async () => {
+    const { port, server, swagFilePath } = await startServerWithSwaggerFile(
+      join(__dirname, 'swagger.yaml'),
     );
-    theServer = undefined;
-    return done();
-  }
-});
+    theServer = server;
 
-test('testing base function with url', async done => {
-  const { port, server } = await startServerWithSwaggerFile(
-    'https://petstore.swagger.io/v2/swagger.json'
-  );
+    expect(swagFilePath).toContain('swagger.yaml');
+    const resp = await got(`http://127.0.0.1:${port}/swagger-doc/`);
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body).toContain('Swagger UI');
+  });
 
-  theServer = server;
+  it('redirects root / to /swagger-doc', async () => {
+    const { port, server } = await startServerWithSwaggerFile(
+      join(__dirname, 'swagger.json'),
+    );
+    theServer = server;
 
-  got(`http://localhost:${port}/swagger-doc`)
-    .then(resp => {
-      if (resp?.statusCode && resp?.statusCode < 400) {
-        return done();
-      }
-      throw new Error('invalid status code');
-    })
-    .catch(err => {
-      throw err;
+    const resp = await got(`http://127.0.0.1:${port}`, {
+      followRedirect: false,
+      throwHttpErrors: false,
     });
-});
+    expect(resp.statusCode).toBe(302);
+    expect(resp.headers.location).toBe('/swagger-doc');
+  });
 
-test('testing base function with url - using base path', async done => {
-  const { port, server } = await startServerWithSwaggerFile(
-    'https://petstore.swagger.io/v2/swagger.json'
-  );
+  it('respects requested custom port if available', async () => {
+    const customPort = 9876;
+    const { port, server } = await startServerWithSwaggerFile(
+      join(__dirname, 'swagger.json'),
+      customPort,
+    );
+    theServer = server;
 
-  theServer = server;
+    expect(port).toBe(customPort);
+  });
 
-  got(`http://localhost:${port}`)
-    .then(resp => {
-      if (resp?.statusCode && resp?.statusCode < 400) {
-        return done();
-      }
-      throw new Error('invalid status code');
-    })
-    .catch(err => {
-      throw err;
+  it('throws error with invalid file path', async () => {
+    await expect(
+      startServerWithSwaggerFile(join(__dirname, 'swagger.json-invalid')),
+    ).rejects.toThrow(/could not be found/);
+  });
+
+  it('throws error with malformed JSON spec', async () => {
+    await expect(
+      startServerWithSwaggerFile(join(__dirname, 'swagger.json-malformed')),
+    ).rejects.toThrow(/Malformed or invalid swagger file/);
+  });
+
+  it('throws error with malformed YAML spec', async () => {
+    await expect(
+      startServerWithSwaggerFile(join(__dirname, 'swagger.yaml-malformed')),
+    ).rejects.toThrow(/Malformed or invalid swagger file/);
+  });
+
+  it('serves swagger UI from URL spec', async () => {
+    const mockServer = http.createServer((req, res) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(readFileSync(join(__dirname, 'swagger.json')));
     });
-});
+    await new Promise<void>((res) => mockServer.listen(0, '127.0.0.1', res));
+    const mockPort = (mockServer.address() as any).port;
 
-afterEach(done => (theServer ? theServer.close(() => done()) : done()), 8000);
+    try {
+      const { port, server } = await startServerWithSwaggerFile(
+        `http://127.0.0.1:${mockPort}/swagger.json`,
+      );
+      theServer = server;
+
+      const resp = await got(`http://127.0.0.1:${port}/swagger-doc/`);
+      expect(resp.statusCode).toBe(200);
+      expect(resp.body).toContain('Swagger UI');
+    } finally {
+      mockServer.close();
+    }
+  });
+});

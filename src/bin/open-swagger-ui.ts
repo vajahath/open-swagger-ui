@@ -4,22 +4,22 @@ import './update-notifier';
 import program from 'commander';
 import { startServerWithSwaggerFile } from '../index';
 import open from 'open';
-const pkgVer = require('../../package.json').version;
+import pkg from '../../package.json';
 import ora from 'ora';
 
 const DEFAULT_PORT = 3355;
 
 program
-  .version(pkgVer)
+  .version(pkg.version)
   .description(
-    'An easy CLI tool to open swagger.json or .yaml files in Swagger UI.'
+    'An easy CLI tool to open swagger.json or .yaml files in Swagger UI.',
   )
   .arguments('<swagger-file>')
   .action(handle)
   .option('-O, --open', 'Open stuff in browser')
   .option(
     '-P, --port <port>',
-    'Preferred port. If not available, a random port is selected'
+    'Preferred port. If not available, a random port is selected',
   );
 
 program.parse(process.argv);
@@ -34,7 +34,7 @@ async function handle(file: string) {
   try {
     const { port, swagFilePath } = await startServerWithSwaggerFile(
       file,
-      sanitizePort(program.port)
+      sanitizePort(program.port),
     );
 
     spinner.text = `Loading file ${swagFilePath}`;

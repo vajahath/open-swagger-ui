@@ -1,24 +1,28 @@
 # open-swagger-ui
 
-An easy CLI to open `swagger.json` or `.yaml` files in [Swagger UI](https://swagger.io/tools/swagger-ui/).
+An easy CLI and library to open `swagger.json` or `.yaml` files in [Swagger UI](https://swagger.io/tools/swagger-ui/).
 
 ```bash
 $ open-swagger-ui ./swagger.json --open # done !
 ```
 
-![](https://github.com/vajahath/open-swagger-ui/workflows/Build/badge.svg) [![](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+![](https://github.com/vajahath/open-swagger-ui/workflows/Build%20&%20Test/badge.svg) [![](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
 ## Install
 
-Requires Node `>=10`.
+Requires Node `>=10`. Compatible with both **CommonJS** and **ESM**.
 
-From npm,
+From npm:
 
 ```sh
 npm i -g open-swagger-ui
 ```
 
-From [Github Package Registry](https://github.com/vajahath/open-swagger-ui/packages). ([Guide](https://help.github.com/en/github/managing-packages-with-github-packages/configuring-npm-for-use-with-github-packages)).
+Or install locally in your project:
+
+```sh
+npm i open-swagger-ui
+```
 
 Type definitions are bundled with this package.
 
@@ -56,12 +60,14 @@ Options:
 
 ## APIs
 
-You can use this as a module too, just in case you want.
+You can use this as a module in both ESM and CommonJS:
 
 ```ts
-const { startServerWithSwaggerFile } = require('open-swagger-ui');
-// or
+// ESM
 import { startServerWithSwaggerFile } from 'open-swagger-ui';
+
+// CommonJS
+const { startServerWithSwaggerFile } = require('open-swagger-ui');
 
 startServerWithSwaggerFile('./path/to/swagger.json', port)
   .then(({ app, port, swagFilePath, server }) => {

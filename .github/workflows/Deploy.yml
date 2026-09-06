@@ -2,8 +2,8 @@ name: Deploy
 
 on:
   release:
-    types: 
-     - published
+    types:
+      - published
 
 jobs:
   Deploy-To-NPM:
@@ -11,31 +11,16 @@ jobs:
     name: Deploy to NPM
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       - run: node --version
       - run: npm ci
       - run: npm run lint
-      - run: ls && npm publish --access=public
+      - run: npm test
+      - run: npm run build
+      - run: npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  Deploy-To-GitHub-Package-Registry:
-    runs-on: ubuntu-latest
-    name: Deploy to GPR
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          registry-url: 'https://npm.pkg.github.com'
-      - run: node --version
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run rescope vajahath
-      - run: ls && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
