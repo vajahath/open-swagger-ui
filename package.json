@@ -33,9 +33,11 @@
   "scripts": {
     "build": "tsdown",
     "pretest": "npm run build",
-    "test": "vitest run",
+    "test": "vitest run && node scripts/test-consumer.cjs",
+    "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "npm run build && vitest run --coverage",
+    "test:consumer": "node scripts/test-consumer.cjs",
     "test:compat": "node scripts/test-compat.cjs",
     "test:docker": "bash scripts/test-docker.sh",
     "prepublishOnly": "npm run test && npm run test:compat",

@@ -8,14 +8,18 @@ This repository contains `open-swagger-ui`, an npm package and CLI tool used to 
 3. **Dual Build Contract**: Emitted files in `dist/` must include both `.cjs` and `.mjs` variants with appropriate `.d.ts` definitions.
 4. **Always Verify with Docker**: Run `npm run test:docker` or verify with `scripts/test-compat.cjs` in a container to confirm Node 10 backward compatibility.
 5. **Release Restraint**: Never publish to npm or push directly to remote branches without explicit user permission.
+6. **Consumer Verification Gate**: Run `npm run test:consumer` to verify real-world package installation, native ESM imports, CommonJS requires, TypeScript type compilation (0 TS7016 errors), and CLI binary execution.
 
 ## Quick Reference
 ```bash
 # Build
 npm run build
 
-# Vitest tests
+# Vitest tests & Consumer gate
 npm test
+
+# Real-world consumer gate (isolated npm pack install, ESM, CJS, TS types, CLI)
+npm run test:consumer
 
 # Verify runtime compatibility on Node 10+
 npm run test:compat

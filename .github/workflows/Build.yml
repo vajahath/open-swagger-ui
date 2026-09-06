@@ -33,8 +33,11 @@ jobs:
       - name: Build Package
         run: npm run build
 
-      - name: Run Vitest Suite
-        run: npm test
+      - name: Run Unit Tests
+        run: npm run test:unit
+
+      - name: Run Real-World Consumer Gate (ESM, CJS, TypeScript Types, Packaged CLI)
+        run: npm run test:consumer
 
       - name: Verify Compatibility (Node 22)
         run: npm run test:compat

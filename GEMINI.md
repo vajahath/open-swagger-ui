@@ -32,7 +32,8 @@
 ## Development Commands
 - **Install dependencies**: `npm install`
 - **Build**: `npm run build`
-- **Run tests**: `npm test` (Vitest)
+- **Run tests**: `npm test` (Vitest & Consumer E2E Gate)
+- **Consumer E2E Gate**: `npm run test:consumer` (verifies tarball pack, isolated installation, ESM, CJS, TS types, CLI)
 - **Run coverage**: `npm run test:coverage`
 - **Compatibility check (local)**: `npm run test:compat`
 - **Compatibility check (Docker)**: `npm run test:docker` (tests inside `node:10-alpine` through `node:22-alpine`)
@@ -44,6 +45,7 @@
 - Unit and integration tests are written in TypeScript in `tests/` using **Vitest**.
 - Tests run directly against source files (`src/index.ts`) during development.
 - End-to-end compatibility is verified against the compiled CJS bundle (`dist/index.cjs`) using `scripts/test-compat.cjs`.
+- External consumer contract (isolated npm install, ESM named imports, TypeScript declaration resolution, CLI flags) is gated via `scripts/test-consumer.cjs`.
 
 ## Release Safeguards
 - **DO NOT** execute `npm publish` directly.
