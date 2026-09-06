@@ -9,19 +9,24 @@
   - CommonJS: `dist/index.cjs` (targeting Node >= 10)
   - ESM: `dist/index.mjs` (for modern ESM consumers and bundlers)
   - CLI Binary: `dist/bin/open-swagger-ui.cjs`
-  - Types: `dist/index.d.ts` and `dist/index.d.mts`
-- **Configuration**: `tsdown.config.ts`
+  - Types: `dist/index.d.ts`, `dist/index.d.cts`, and `dist/index.d.mts`
+- **Configuration**: `tsdown.config.mts`
 
 ## Critical Compatibility Requirements
 > [!IMPORTANT]
-> **Maintain Node.js >= 10 Compatibility**:
+> **Maintain Node.js >= 10 and Dual CJS/ESM Compatibility**:
 > - The package must remain functional for end users running Node.js versions down to **Node 10**.
-> - **DO NOT upgrade runtime dependencies** (`got`, `ora`, `get-port`, `open`, `update-notifier`) to major versions that dropped CommonJS or dropped support for Node 10.
->   - `got`: Keep at `^11.8.5` (v12+ is pure ESM and requires Node 14+)
+> - **DO NOT upgrade runtime dependencies** beyond versions that dropped CommonJS or dropped support for Node 10.
+>   - `commander`: Keep at `^11.1.0` (v12+ dropped Node 10, v15 dropped CJS)
+>   - `express`: Keep at `^4.21.2` (v5+ dropped Node 10)
+>   - `swagger-ui-express`: Keep at `^5.0.1` (Swagger UI v5, supports Node 10 + CJS/ESM)
+>   - `ora`: Keep at `^5.4.1` (v6+ is pure ESM and requires Node 14+)
+>   - `update-notifier`: Keep at `^5.1.0` (v6+ is pure ESM and requires Node 14+)
+>   - `upath`: Keep at `^2.0.1` (v3+ is pure ESM and requires Node 20+)
+>   - `got`: Keep at `^11.8.6` (v12+ is pure ESM and requires Node 14+)
 >   - `get-port`: Keep at `^5.1.1` (v6+ is pure ESM and requires Node 12+)
->   - `open`: Keep at `^8.4.0` (v9+ is pure ESM and requires Node 14+)
->   - `ora`: Keep at `^4.0.3` (v5+ requires Node 10+, v6+ requires Node 14+)
->   - `update-notifier`: Keep at `^4.0.0` (v5+ requires Node 10+, v6+ requires Node 14+)
+>   - `open`: Keep at `^8.4.2` (v9+ is pure ESM and requires Node 14+)
+>   - `js-yaml`: Keep at `^4.1.0`
 > - Target syntax for emitted CJS code is `node10` / `es2018`.
 
 ## Development Commands

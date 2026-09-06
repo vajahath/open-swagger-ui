@@ -74,17 +74,17 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
-    "commander": "^4.1.0",
-    "express": "^4.17.1",
+    "commander": "^11.1.0",
+    "express": "^4.21.2",
     "get-port": "^5.1.1",
-    "got": "^11.8.5",
+    "got": "^11.8.6",
     "is-url": "^1.2.4",
     "js-yaml": "^4.1.0",
     "lodash.isplainobject": "^4.0.6",
-    "open": "^8.4.0",
-    "ora": "^4.0.3",
-    "swagger-ui-express": "^4.1.2",
-    "upath": "^1.2.0",
-    "update-notifier": "^4.0.0"
+    "open": "^8.4.2",
+    "ora": "^5.4.1",
+    "swagger-ui-express": "^5.0.1",
+    "upath": "^2.0.1",
+    "update-notifier": "^5.1.0"
   }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import './update-notifier';
-import program from 'commander';
+import { program } from 'commander';
 import { startServerWithSwaggerFile } from '../index';
 import open from 'open';
 import pkg from '../../package.json';
@@ -32,22 +32,25 @@ if (!process.env.VITEST) {
  */
 export async function handle(file: string) {
   const spinner = ora('Loading file ..').start();
+  const opts = program.opts ? program.opts() : (program as any);
+  const shouldOpen = opts.open || (program as any).open;
+  const rawPort = opts.port || (program as any).port;
 
   try {
     const { port, swagFilePath } = await startServerWithSwaggerFile(
       file,
-      sanitizePort(program.port),
+      sanitizePort(rawPort),
     );
 
     spinner.text = `Loading file ${swagFilePath}`;
 
     const viewUrl = `http://localhost:${port}/swagger-doc`;
-    if (program.open) {
+    if (shouldOpen) {
       await open(viewUrl);
     }
     spinner.succeed();
     console.log(`Swagger open on port ${port}`);
-    if (program.open) {
+    if (shouldOpen) {
       console.log('Opening browser at ' + viewUrl);
     }
     return { port, swagFilePath };
