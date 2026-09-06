@@ -120,7 +120,10 @@ async function main() {
 
     console.log('Checking CLI server invocation with JSON spec and -P flag...');
     await new Promise((resolve, reject) => {
-      const proc = spawn(cliBin, ['swagger.json', '-P', '6221'], { cwd: tempDir });
+      const proc = spawn(cliBin, ['swagger.json', '-P', '6221'], {
+        cwd: tempDir,
+        shell: process.platform === 'win32',
+      });
       let output = '';
       let timer;
       proc.stdout.on('data', (chunk) => {
@@ -155,7 +158,10 @@ async function main() {
 
     console.log('Checking CLI server invocation with YAML spec and --port flag...');
     await new Promise((resolve, reject) => {
-      const proc = spawn(cliBin, ['swagger.yaml', '--port', '6222'], { cwd: tempDir });
+      const proc = spawn(cliBin, ['swagger.yaml', '--port', '6222'], {
+        cwd: tempDir,
+        shell: process.platform === 'win32',
+      });
       let output = '';
       let timer;
       proc.stdout.on('data', (chunk) => {
@@ -187,6 +193,7 @@ async function main() {
     const invalidFileRes = spawnSync(cliBin, ['non-existent-spec.yaml'], {
       cwd: tempDir,
       encoding: 'utf8',
+      shell: process.platform === 'win32',
     });
     assert.ok(
       invalidFileRes.stderr.includes('could not be found') ||
