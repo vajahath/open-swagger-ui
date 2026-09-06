@@ -31,11 +31,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Run Vitest Suite
-        run: npm test
-
       - name: Build Package
         run: npm run build
+
+      - name: Run Vitest Suite
+        run: npm test
 
       - name: Verify Compatibility (Local Node)
         run: npm run test:compat
