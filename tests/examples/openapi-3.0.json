@@ -1,0 +1,20 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Sample Users API",
+    "description": "A modern OpenAPI 3.0 JSON example spec",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "summary": "Get user list",
+        "responses": {
+          "200": {
+            "description": "User list response"
+          }
+        }
+      }
+    }
+  }
+}

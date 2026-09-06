@@ -1,0 +1,29 @@
+openapi: 3.0.3
+info:
+  title: Sample Books API
+  description: A modern OpenAPI 3.0 example spec for open-swagger-ui
+  version: 1.0.0
+paths:
+  /books:
+    get:
+      summary: List all books
+      responses:
+        '200':
+          description: A list of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Clean Code

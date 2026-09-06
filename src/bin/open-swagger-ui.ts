@@ -22,13 +22,15 @@ program
     'Preferred port. If not available, a random port is selected',
   );
 
-program.parse(process.argv);
+if (!process.env.VITEST) {
+  program.parse(process.argv);
+}
 
 /**
  * Handles incoming file
  * @param {string} file swagger file
  */
-async function handle(file: string) {
+export async function handle(file: string) {
   const spinner = ora('Loading file ..').start();
 
   try {
@@ -48,6 +50,7 @@ async function handle(file: string) {
     if (program.open) {
       console.log('Opening browser at ' + viewUrl);
     }
+    return { port, swagFilePath };
   } catch (err) {
     spinner.fail();
     console.error(err);
@@ -56,10 +59,10 @@ async function handle(file: string) {
 
 /**
  * Handle the incoming preferred port request
- * @param {number|string} port preferred port
+ * @param {number|string} [port] preferred port
  * @return {number}
  */
-function sanitizePort(port: string | number): number {
+export function sanitizePort(port?: string | number): number {
   if (!port) {
     return DEFAULT_PORT;
   }
@@ -68,3 +71,5 @@ function sanitizePort(port: string | number): number {
   }
   return port;
 }
+
+export { program };
