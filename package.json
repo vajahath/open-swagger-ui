@@ -32,9 +32,10 @@
   },
   "scripts": {
     "build": "tsdown",
+    "pretest": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "npm run build && vitest run --coverage",
     "test:compat": "node scripts/test-compat.cjs",
     "test:docker": "bash scripts/test-docker.sh",
     "prepublishOnly": "npm run test && npm run test:compat",

@@ -6,7 +6,7 @@
 const path = require('path');
 const http = require('http');
 const assert = require('assert');
-const { spawnSync } = require('child_process');
+const { spawnSync, spawn } = require('child_process');
 
 const pkg = require('../package.json');
 const { startServerWithSwaggerFile } = require('../dist/index.cjs');
@@ -102,6 +102,53 @@ async function run() {
     'CLI help output should mention open-swagger-ui/Usage'
   );
   console.log('Test 5 passed!');
+
+  // Test 6: Test CLI --version output
+  console.log('Test 6: Testing CLI binary execution (--version)...');
+  const cliVerRes = spawnSync(process.execPath, [binPath, '--version'], {
+    encoding: 'utf8',
+  });
+  assert.strictEqual(cliVerRes.status, 0, 'CLI --version should exit with code 0: ' + cliVerRes.stderr);
+  assert.strictEqual(cliVerRes.stdout.trim(), pkg.version, 'CLI version should match package.json');
+  console.log('Test 6 passed!');
+
+  // Test 7: Test CLI end-to-end server invocation
+  console.log('Test 7: Testing CLI end-to-end server invocation with swagger file...');
+  const cliProc = spawn(process.execPath, [
+    binPath,
+    path.join(__dirname, '../tests/examples/minimal-swagger.yaml'),
+    '--port',
+    '3399',
+  ]);
+  try {
+    await new Promise(function (resolve, reject) {
+      let output = '';
+      cliProc.stdout.on('data', function (chunk) {
+        output += chunk.toString();
+        if (output.indexOf('Swagger open on port 3399') !== -1) {
+          resolve();
+        }
+      });
+      cliProc.stderr.on('data', function (chunk) {
+        output += chunk.toString();
+      });
+      cliProc.on('error', reject);
+      cliProc.on('exit', function (code) {
+        if (code !== null && code !== 0) {
+          reject(new Error('CLI process exited early with code ' + code + ': ' + output));
+        }
+      });
+      setTimeout(function () {
+        reject(new Error('Timed out waiting for CLI server to start. Output: ' + output));
+      }, 8000);
+    });
+
+    const cliHttpResp = await httpGet('http://localhost:3399/swagger-doc/');
+    assert.strictEqual(cliHttpResp.statusCode, 200, 'CLI server should serve Swagger UI with HTTP 200');
+    console.log('Test 7 passed!');
+  } finally {
+    cliProc.kill('SIGTERM');
+  }
 
   console.log('All compatibility tests passed successfully on Node.js ' + process.version + '!');
 }

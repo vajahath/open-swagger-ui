@@ -6,7 +6,9 @@ import { join } from 'path';
 import got from 'got';
 import http, { Server } from 'http';
 import { readFileSync } from 'fs';
+import { spawnSync } from 'child_process';
 import open from 'open';
+import pkg from '../package.json';
 
 vi.mock('open', () => ({
   default: vi.fn().mockResolvedValue(undefined),
@@ -210,6 +212,32 @@ describe('open-swagger-ui test suite', () => {
     it('CLI handle function gracefully handles failure on invalid file', async () => {
       const res = await handle(join(__dirname, 'non-existent-file.json'));
       expect(res).toBeUndefined();
+    });
+
+    it('CLI binary executes --help without error (Issue #21)', () => {
+      const binPath = join(__dirname, '../dist/bin/open-swagger-ui.cjs');
+      const env = { ...process.env };
+      delete env.VITEST;
+      const res = spawnSync(process.execPath, [binPath, '--help'], {
+        encoding: 'utf8',
+        env,
+      });
+      expect(res.status).toBe(0);
+      expect(res.stdout).toContain('Usage:');
+      expect(res.stdout).toContain('--help');
+      expect(res.stderr).not.toContain('ERR_INVALID_ARG_TYPE');
+    });
+
+    it('CLI binary executes --version without error', () => {
+      const binPath = join(__dirname, '../dist/bin/open-swagger-ui.cjs');
+      const env = { ...process.env };
+      delete env.VITEST;
+      const res = spawnSync(process.execPath, [binPath, '--version'], {
+        encoding: 'utf8',
+        env,
+      });
+      expect(res.status).toBe(0);
+      expect(res.stdout.trim()).toBe(pkg.version);
     });
   });
 });

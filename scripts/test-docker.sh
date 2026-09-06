@@ -8,7 +8,7 @@ echo "=========================================="
 echo " Running Compatibility Tests in Docker"
 echo "=========================================="
 
-VERSIONS=("10" "12" "14" "16" "18" "20" "22")
+VERSIONS=("10.15" "10" "12" "14" "16" "18" "20" "22")
 
 for VER in "${VERSIONS[@]}"; do
   echo ""
