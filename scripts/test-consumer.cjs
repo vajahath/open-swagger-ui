@@ -51,6 +51,25 @@ function runCommand(command, args, options = {}) {
   return result;
 }
 
+function killProcess(proc) {
+  if (!proc || proc.killed) return;
+  if (process.platform === 'win32' && proc.pid) {
+    try {
+      spawnSync('taskkill', ['/pid', String(proc.pid), '/T', '/F'], {
+        stdio: 'ignore',
+        windowsHide: true,
+      });
+    } catch {}
+  }
+  try {
+    proc.kill('SIGKILL');
+  } catch {}
+  try {
+    if (proc.stdout) proc.stdout.destroy();
+    if (proc.stderr) proc.stderr.destroy();
+  } catch {}
+}
+
 async function main() {
   console.log('====================================================');
   console.log(' Starting Real-World Consumer Verification Gate');
@@ -140,17 +159,17 @@ async function main() {
               assert.strictEqual(docRes.statusCode, 200, 'Swagger UI must return 200');
               assert.ok(docRes.body.includes('Swagger UI'), 'Page must contain "Swagger UI"');
 
-              proc.kill();
+              killProcess(proc);
               resolve();
             } catch (err) {
-              proc.kill();
+              killProcess(proc);
               reject(err);
             }
           })();
         }
       });
       timer = setTimeout(() => {
-        proc.kill();
+        killProcess(proc);
         reject(new Error(`Timed out waiting for CLI server to start: ${output}`));
       }, 7000);
     });
@@ -173,17 +192,17 @@ async function main() {
               const docRes = await httpGet('http://127.0.0.1:6222/swagger-doc/');
               assert.strictEqual(docRes.statusCode, 200, 'YAML Swagger UI must return 200');
               assert.ok(docRes.body.includes('Swagger UI'), 'Page must contain "Swagger UI"');
-              proc.kill();
+              killProcess(proc);
               resolve();
             } catch (err) {
-              proc.kill();
+              killProcess(proc);
               reject(err);
             }
           })();
         }
       });
       timer = setTimeout(() => {
-        proc.kill();
+        killProcess(proc);
         reject(new Error(`Timed out waiting for YAML CLI server: ${output}`));
       }, 7000);
     });
@@ -337,7 +356,11 @@ testTypings();
   }
 }
 
-main().catch((err) => {
-  console.error('\n❌ Consumer Gate Failed:\n', err);
-  process.exit(1);
-});
+main()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('\n❌ Consumer Gate Failed:\n', err);
+    process.exit(1);
+  });
