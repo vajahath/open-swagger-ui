@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     ignore:
       # Pinned for Node.js >= 10 runtime & dual CJS/ESM compatibility
       - dependency-name: "commander"
@@ -42,4 +42,4 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
