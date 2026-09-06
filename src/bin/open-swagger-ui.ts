@@ -2,7 +2,6 @@
 
 import './update-notifier';
 import { program } from 'commander';
-import { startServerWithSwaggerFile } from '../index';
 import open from 'open';
 import pkg from '../../package.json';
 import ora from 'ora';
@@ -37,6 +36,7 @@ export async function handle(file: string) {
   const rawPort = opts.port || (program as any).port;
 
   try {
+    const { startServerWithSwaggerFile } = await import('../index');
     const { port, swagFilePath } = await startServerWithSwaggerFile(
       file,
       sanitizePort(rawPort),
