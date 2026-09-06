@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    ignore:
+      # Pinned for Node.js >= 10 runtime & dual CJS/ESM compatibility
+      - dependency-name: "commander"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "express"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "swagger-ui-express"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "ora"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "update-notifier"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "upath"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "got"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "get-port"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "open"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "js-yaml"
+        update-types: ["version-update:semver-major"]
+
+      # DevDependencies pinned to stable toolchain
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitest/coverage-v8"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
